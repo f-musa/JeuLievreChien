@@ -64,7 +64,7 @@ int main(int argc, char** argv){
                 case SDL_MOUSEMOTION:
                     p.x = event.motion.x;
                     p.y = event.motion.y;
-                    //hoverHandlerOptions(window,renderer,p);
+                    hoverHandlerOptions(window,renderer,p);
                     ;
                 break;
                 case SDL_MOUSEBUTTONDOWN :
@@ -74,6 +74,7 @@ int main(int argc, char** argv){
                 break;
             }
         }
+        sleep(1);
     }
     
     Quit :
