@@ -2,6 +2,34 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+/*********************** Structures ************************/
+typedef struct menu{
+    SDL_Rect option1 ;    
+    SDL_Rect option2 ;    
+    SDL_Rect option3 ;       
+    SDL_Rect retour ; 
+}Menu;
+
+typedef struct casePlateau{
+    SDL_Rect rect;
+    int estOccupee;
+}Case;
+
+typedef struct piece{
+    SDL_Rect image;
+    Case *position;
+    Case *position_precedente;
+}Piece;
+
+typedef struct plateau{
+    Case bas;Case haut;
+    Case l1_gauche;Case l1_milieu;Case l1_droite;
+    Case l2_gauche;Case l2_milieu;Case l2_droite;
+    Case l3_gauche;Case l3_milieu;Case l3_droite;
+    Piece lievre;
+    Piece chien_1;Piece chien_2;Piece chien_3;
+}Plateau;
+
 typedef struct menu{
     SDL_Rect option1 ;    
     SDL_Rect option2 ;    
@@ -18,6 +46,7 @@ extern Menu mode2Joueurs;
 extern Menu reglesJeu;
 extern char joueur1;
 extern char joueur2;
+extern Plateau p;
 /*******************************************************************************/
 
 /* 
@@ -40,3 +69,5 @@ void clickHandlerOptions(SDL_Window *,SDL_Renderer *,SDL_Point);
     Fonction qui permet de changer d'écran 
 */
 void switchScreen(SDL_Renderer*,char*,char*,int);
+
+void initPlateau()

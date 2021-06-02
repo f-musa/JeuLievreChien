@@ -2,95 +2,95 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include "game.h"
 
-/* Fermer la fenêtre */
-void closeWindow(){
-    bool isquit = false;
-        SDL_Event event;
-        while (!isquit) 
-            if (SDL_PollEvent( & event)) 
-                if (event.type == SDL_QUIT) 
-                    isquit = true;
-}
+/********************* Variables globales statiques ****************/
+char currentFenetre[50]; /*variable globale static qui permet de savoir la fenetre courante*/
+Menu menuPrincipal;
+Menu commencerUnePartie;
+Menu mode2Joueurs;
+Menu reglesJeu;
+int continuer;
+char joueur1;
+char joueur2;
+Plateau pl;
+/********************************************************************/
 
-/* Fonction permettant de vérifier si un point appartient à un rectangle */
-SDL_bool test(SDL_Point point, SDL_Rect rect){
-    if(point.x >= rect.x && point.x <= (rect.x + rect.w) 
-        && point.y >= rect.y && point.y <= (rect.y + rect.h))
-            return SDL_TRUE;
-        return SDL_FALSE;
-}
+int main(int argc, char** argv){
 
-/* Fonction permettant de changer la couleur de la fenêtre */
-int setWindowColor(SDL_Renderer * renderer, SDL_Color color){
-    if(SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a) < 0)
-        return -1;
-    if(SDL_RenderClear(renderer) < 0)
-        return -1;
-    return 0;
-}
-
-int main2(int argc, char** argv){
-
-        SDL_Window *window = NULL;
-        SDL_Renderer *renderer = NULL;
-        SDL_Texture *texture = NULL;
-        int statut = EXIT_FAILURE;
-        SDL_Color blanc = {200, 200, 200, 0};
-        
-        if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) != 0 ){
+    SDL_Window *window = NULL;     
+    SDL_Renderer *renderer = NULL ;     
+    SDL_Event event;
+    continuer = 1;
+    if (SDL_Init(SDL_INIT_VIDEO) != 0 ){
             fprintf(stderr,"Érreur SDL_Init : %s", SDL_GetError());
             goto Quit;
         }
 
-        if(SDL_CreateWindowAndRenderer(840, 680, SDL_WINDOW_SHOWN, &window, &renderer) != 0){
+    if(SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_SHOWN, &window, &renderer) != 0){
             fprintf(stderr, "Erreur SDL_CreateWindowRenderer : %s", SDL_GetError());
             goto Quit;
+    }
+    
+    /*Affichage du message d'accueil et ransition vers le menu */
+    transitionMenu(window,renderer);
+    strcpy(currentFenetre,"menuPrincipal"); // Update la variable correspondant a la fenetre courante
+
+    /* Menu Init */
+    menuPrincipal.option1 = (SDL_Rect){111,168,550,84}; 
+    menuPrincipal.option2 = (SDL_Rect){148,260,492,89};  
+    menuPrincipal.option3 = (SDL_Rect){150,362,491,78};
+
+    commencerUnePartie.option1 = (SDL_Rect){163,185,450,82};
+    commencerUnePartie.option2 = (SDL_Rect){73,284,616,74};
+    commencerUnePartie.retour = (SDL_Rect){7,496,156,62};
+    
+    reglesJeu.retour = (SDL_Rect) {13,494,167,64};
+    
+    mode2Joueurs.option1 = (SDL_Rect){300,285,182,66};
+    mode2Joueurs.option2 = (SDL_Rect){303,376,180,68};
+    mode2Joueurs.retour = (SDL_Rect){14,495,160,59};
+    /***********/
+
+    pl.bas.rect = (SDL_Rect){694,226,78,78};
+    pl.l1_gauche.rect = (SDL_Rect){535,402,70,75};
+    pl.l1_milieu.rect = (SDL_Rect){536,229,70,75};
+    pl.l1_droite.rect = (SDL_Rect){530,50,82,83};
+    pl.l2_gauche.rect = (SDL_Rect){359,397,84,88};
+    pl.l2_milieu.rect = (SDL_Rect){359,225,82,82};
+    pl.l2_droite.rect = (SDL_Rect){357,47,83,87};
+    pl.l3_gauche.rect = (SDL_Rect){191,399,79,77};
+    pl.l3_milieu.rect = (SDL_Rect){188,221,83,89};
+    pl.l3_droite.rect = (SDL_Rect){190,51,82,85};
+    pl.haut.rect = (SDL_Rect){23,220,91,92};
+    pl.chien_1.position = &pl.haut; pl.chien_2.position = &pl.haut; pl.chien_3.position = &pl.haut;
+    pl.lievre.position = &pl.haut;
+    while(continuer)
+    {
+         while(SDL_PollEvent(&event)){
+            SDL_Point p;      
+            switch (event.type )
+            {
+                case SDL_QUIT:
+                    continuer = 0;
+                break;
+
+                case SDL_MOUSEMOTION:
+                    p.x = event.motion.x;
+                    p.y = event.motion.y;
+                    hoverHandlerOptions(window,renderer,p);
+                    ;
+                break;
+                case SDL_MOUSEBUTTONDOWN :
+                    p.x = event.button.x;
+                    p.y = event.button.y;
+                    clickHandlerOptions(window,renderer,p);
+                break;
+            }
         }
-
-        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 200, 200);
-        if(texture == NULL){
-            fprintf(stderr, "Erreur SDL_CreateTexture : %s", SDL_GetError());
-            goto Quit;
-        } 
-
-        SDL_SetRenderDrawColor(renderer, blanc.r, blanc.g, blanc.b, blanc.a);
-        SDL_RenderClear(renderer);
-
-        SDL_Surface *tmp = NULL;
-        tmp = SDL_LoadBMP("images/imagesBMP/accueil.bmp");
-        if(tmp == NULL){
-            fprintf(stderr, "Erreur SDL_LoadBMP : %s", SDL_GetError());
-            goto Quit;
-        }
-        texture = SDL_CreateTextureFromSurface(renderer, tmp);
-
-        if(texture == NULL){
-            fprintf(stderr, "Erreur SDL_CreateTextureFromSurface : %s", SDL_GetError());
-            goto Quit;
-        }
-
-        SDL_Rect dstrect = { 0, 0, 840, 680};
-        SDL_RenderCopy(renderer, texture, NULL, &dstrect);
-        /* SDL_Rect dstrect2 = { 150, 180, 100, 100};
-        SDL_RenderCopy(renderer, texture, NULL, &dstrect2); */
-        
-        SDL_RenderPresent(renderer);
-
-        statut = EXIT_SUCCESS;
-        closeWindow();
-
-Quit:
-        if(tmp != NULL)
-            SDL_FreeSurface(tmp);
-        if(texture != NULL)
-            SDL_DestroyTexture(texture);
-        if(renderer != NULL)
-            SDL_DestroyRenderer(renderer);
-        if(window != NULL)
-            SDL_DestroyWindow(window);
-
-        SDL_Quit();
-
-    return statut;   
+        sleep(1);
+    }
+    
+    Quit :
+    return 1;
 }
