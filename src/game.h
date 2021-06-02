@@ -28,14 +28,9 @@ typedef struct plateau{
     Case l3_gauche;Case l3_milieu;Case l3_droite;
     Piece lievre;
     Piece chien_1;Piece chien_2;Piece chien_3;
+    int tour_a;
 }Plateau;
 
-typedef struct menu{
-    SDL_Rect option1 ;    
-    SDL_Rect option2 ;    
-    SDL_Rect option3 ;       
-    SDL_Rect retour ; 
-}Menu;
 
 /*******************************Variables globales statiques********************/
 extern char currentFenetre[50]; /*variable globale static qui permet de savoir la fenetre courante*/
@@ -46,7 +41,7 @@ extern Menu mode2Joueurs;
 extern Menu reglesJeu;
 extern char joueur1;
 extern char joueur2;
-extern Plateau p;
+extern Plateau pl;
 /*******************************************************************************/
 
 /* 
@@ -70,4 +65,13 @@ void clickHandlerOptions(SDL_Window *,SDL_Renderer *,SDL_Point);
 */
 void switchScreen(SDL_Renderer*,char*,char*,int);
 
-void initPlateau()
+
+/*
+    Fonction qui permet de charger une image  
+*/
+void loadImage(const char [], SDL_Renderer *, SDL_Rect *);
+
+/* 
+    Fonction qui permet d'intialiser le plateau de jeu 
+*/
+void initPartie(Plateau *, SDL_Renderer *);

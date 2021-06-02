@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <unistd.h>
 #include "game.h"
 
 /********************* Variables globales statiques ****************/
@@ -52,19 +53,20 @@ int main(int argc, char** argv){
     mode2Joueurs.retour = (SDL_Rect){14,495,160,59};
     /***********/
 
-    pl.bas.rect = (SDL_Rect){694,226,78,78};
-    pl.l1_gauche.rect = (SDL_Rect){535,402,70,75};
-    pl.l1_milieu.rect = (SDL_Rect){536,229,70,75};
-    pl.l1_droite.rect = (SDL_Rect){530,50,82,83};
-    pl.l2_gauche.rect = (SDL_Rect){359,397,84,88};
-    pl.l2_milieu.rect = (SDL_Rect){359,225,82,82};
-    pl.l2_droite.rect = (SDL_Rect){357,47,83,87};
-    pl.l3_gauche.rect = (SDL_Rect){191,399,79,77};
-    pl.l3_milieu.rect = (SDL_Rect){188,221,83,89};
-    pl.l3_droite.rect = (SDL_Rect){190,51,82,85};
-    pl.haut.rect = (SDL_Rect){23,220,91,92};
-    pl.chien_1.position = &pl.haut; pl.chien_2.position = &pl.haut; pl.chien_3.position = &pl.haut;
-    pl.lievre.position = &pl.haut;
+    pl.bas.rect = (SDL_Rect){697,224,72,75};
+    pl.l1_gauche.rect = (SDL_Rect){534,396,70,76};
+    pl.l1_milieu.rect = (SDL_Rect){534,225,72,69};
+    pl.l1_droite.rect = (SDL_Rect){535,51,70,75};
+    pl.l2_gauche.rect = (SDL_Rect){366,397,69,74};
+    pl.l2_milieu.rect = (SDL_Rect){364,225,70,72};
+    pl.l2_droite.rect = (SDL_Rect){366,52,69,73};
+    pl.l3_gauche.rect = (SDL_Rect){196,394,69,75};
+    pl.l3_milieu.rect = (SDL_Rect){196,225,70,74};
+    pl.l3_droite.rect = (SDL_Rect){193,53,72,74};
+    pl.haut.rect = (SDL_Rect){31,224,72,74};
+    
+    
+    
     while(continuer)
     {
          while(SDL_PollEvent(&event)){
@@ -78,7 +80,7 @@ int main(int argc, char** argv){
                 case SDL_MOUSEMOTION:
                     p.x = event.motion.x;
                     p.y = event.motion.y;
-                    hoverHandlerOptions(window,renderer,p);
+                    //hoverHandlerOptions(window,renderer,p);
                     ;
                 break;
                 case SDL_MOUSEBUTTONDOWN :
