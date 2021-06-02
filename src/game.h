@@ -28,6 +28,7 @@ typedef struct plateau{
     Case l3_gauche;Case l3_milieu;Case l3_droite;
     Piece lievre;
     Piece chien_1;Piece chien_2;Piece chien_3;
+    SDL_Rect main_joueur ;
     int tour_a;
 }Plateau;
 
@@ -44,6 +45,10 @@ extern char joueur2;
 extern Plateau pl;
 /*******************************************************************************/
 
+/* 
+    Fonction qui initialise les zones des differents menus
+*/
+void menuInit(void);
 /* 
     Fonction qui permet d'afficher le message d'accueil puis au bout de 1 seconde de passer au menu
 */
@@ -75,3 +80,4 @@ void loadImage(const char [], SDL_Renderer *, SDL_Rect *);
     Fonction qui permet d'intialiser le plateau de jeu 
 */
 void initPartie(Plateau *, SDL_Renderer *);
+

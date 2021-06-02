@@ -38,33 +38,9 @@ int main(int argc, char** argv){
     strcpy(currentFenetre,"menuPrincipal"); // Update la variable correspondant a la fenetre courante
 
     /* Menu Init */
-    menuPrincipal.option1 = (SDL_Rect){111,168,550,84}; 
-    menuPrincipal.option2 = (SDL_Rect){148,260,492,89};  
-    menuPrincipal.option3 = (SDL_Rect){150,362,491,78};
-
-    commencerUnePartie.option1 = (SDL_Rect){163,185,450,82};
-    commencerUnePartie.option2 = (SDL_Rect){73,284,616,74};
-    commencerUnePartie.retour = (SDL_Rect){7,496,156,62};
-    
-    reglesJeu.retour = (SDL_Rect) {13,494,167,64};
-    
-    mode2Joueurs.option1 = (SDL_Rect){300,285,182,66};
-    mode2Joueurs.option2 = (SDL_Rect){303,376,180,68};
-    mode2Joueurs.retour = (SDL_Rect){14,495,160,59};
+    menuInit();
     /***********/
 
-    pl.bas.rect = (SDL_Rect){697,224,72,75};
-    pl.l1_gauche.rect = (SDL_Rect){534,396,70,76};
-    pl.l1_milieu.rect = (SDL_Rect){534,225,72,69};
-    pl.l1_droite.rect = (SDL_Rect){535,51,70,75};
-    pl.l2_gauche.rect = (SDL_Rect){366,397,69,74};
-    pl.l2_milieu.rect = (SDL_Rect){364,225,70,72};
-    pl.l2_droite.rect = (SDL_Rect){366,52,69,73};
-    pl.l3_gauche.rect = (SDL_Rect){196,394,69,75};
-    pl.l3_milieu.rect = (SDL_Rect){196,225,70,74};
-    pl.l3_droite.rect = (SDL_Rect){193,53,72,74};
-    pl.haut.rect = (SDL_Rect){31,224,72,74};
-    
     
     
     while(continuer)
