@@ -98,4 +98,4 @@ int verifDeplacement();
 void deplacerCase(SDL_Renderer *);
 
 /* Fonction qui permet de verifier si un joueur a gagner la partie*/
-void verifGagnant();
+void verifGagnant(SDL_Renderer *);
