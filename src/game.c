@@ -16,6 +16,69 @@ void menuInit()
     mode2Joueurs.option2 = (SDL_Rect){303,376,180,68};
     mode2Joueurs.retour = (SDL_Rect){14,495,160,59};
 }
+void loadImage(const char path[], SDL_Renderer *renderer,SDL_Rect * rect)
+{
+    SDL_Surface *tmp = NULL;
+    tmp = SDL_LoadBMP(path);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, tmp);
+    SDL_FreeSurface(tmp); 
+    SDL_RenderCopy(renderer, texture, NULL, rect);
+    SDL_RenderPresent(renderer);
+}
+
+void initPartie(Plateau * pl, SDL_Renderer * renderer)
+{
+    /* Definition des zones correspondants aux differentes cases */
+    pl->bas.rect = (SDL_Rect){697,224,72,75};
+    pl->l1_gauche.rect = (SDL_Rect){534,396,70,76};
+    pl->l1_milieu.rect = (SDL_Rect){534,225,72,69};
+    pl->l1_droite.rect = (SDL_Rect){535,51,70,75};
+    pl->l2_gauche.rect = (SDL_Rect){366,397,69,74};
+    pl->l2_milieu.rect = (SDL_Rect){364,225,70,72};
+    pl->l2_droite.rect = (SDL_Rect){366,52,69,73};
+    pl->l3_gauche.rect = (SDL_Rect){196,394,69,75};
+    pl->l3_milieu.rect = (SDL_Rect){196,225,70,74};
+    pl->l3_droite.rect = (SDL_Rect){193,53,72,74};
+    pl->main_joueur = (SDL_Rect){278,530,282,62 };
+    pl->haut.rect = (SDL_Rect){31,224,72,74};
+    /* Coordonnees correspondants aux differents plateaux */
+    pl->bas.x = 2; pl->bas.y = 0;
+    pl->l1_gauche.x = 1; pl->l1_gauche.y = -1;
+    pl->l1_milieu.x = 1; pl->l1_milieu.y = 0;
+    pl->l1_droite.x = 1; pl->l1_droite.y = 1;
+    pl->l2_gauche.x = 0; pl->l2_gauche.y = -1;
+    pl->l2_milieu.x = 0; pl->l2_milieu.y = 0;
+    pl->l2_droite.x = 0; pl->l2_droite.y = 1;
+    pl->l3_gauche.x = -1; pl->l3_gauche.y = -1;
+    pl->l3_milieu.x = -1; pl->l3_milieu.y = 0;
+    pl->l3_droite.x = -1; pl->l3_droite.y = 1;
+    pl->haut.x = -2 ; pl->haut.y = 0 ;
+    
+    /* Affectation des positions des differentes pieces */
+    pl->chien_1.position = &pl->haut; pl->chien_1.position_precedente = &pl->haut; 
+    pl->chien_2.position = &pl->l3_droite; pl->chien_2.position_precedente = &pl->l3_droite; 
+    pl->chien_3.position = &pl->l3_gauche; pl->chien_3.position_precedente = &pl->l3_gauche; 
+    pl->lievre.position = &pl->bas; pl->lievre.position_precedente = &pl->bas;
+    pl->bas.occupant = 'l'; pl->haut.occupant = 'c' ;
+    pl->l3_droite.occupant = 'c';pl->l3_gauche.occupant ='c';      
+    /* Definition des statuts (occupee ou pas) des differentes cases */ 
+    pl->bas.estOccupee = 1;pl->haut.estOccupee = 1;pl->l3_droite.estOccupee = 1;
+    pl->l3_gauche.estOccupee = 1;pl->l3_milieu.estOccupee = 0;pl->l1_milieu.estOccupee = 0;
+    pl->l1_gauche.estOccupee = 0;pl->l1_droite.estOccupee = 0;pl->l2_milieu.estOccupee = 0;
+    pl->l2_gauche.estOccupee = 0;pl->l2_droite.estOccupee = 0;
+    /* Chargement des images des differentes pieces */
+    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_1.position->rect) ;   
+    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_2.position->rect) ;   
+    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_3.position->rect) ;   
+    loadImage("images/imagesBMP/lievre.bmp",renderer,&pl->lievre.position->rect) ;
+    if (joueur1 =='c')
+        loadImage("images/imagesBMP/Main_Joueur1.bmp",renderer,&pl->main_joueur) ;
+    else 
+        loadImage("images/imagesBMP/Main_Joueur2.bmp",renderer,&pl->main_joueur) ;
+    pl->tour_a = 'c';
+       
+    SDL_RenderPresent(renderer);
+}
 void transitionMenu (SDL_Window * window,SDL_Renderer *renderer)
 {
     SDL_Surface *tmp = NULL;
@@ -122,7 +185,101 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
         }  
      }
   }
-  
+  Case * detectCase (SDL_Point p)
+  { 
+      Case * c = NULL;
+      if(SDL_PointInRect(&p,&pl.bas.rect))
+        c = &pl.bas;
+      else 
+        if(SDL_PointInRect(&p,&pl.haut.rect))
+        c = &pl.haut;
+      else 
+        if(SDL_PointInRect(&p,&pl.l1_droite.rect))
+        c = &pl.l1_droite;
+      else 
+        if(SDL_PointInRect(&p,&pl.l1_gauche.rect))
+        c = &pl.l1_gauche;
+      else 
+        if(SDL_PointInRect(&p,&pl.l1_milieu.rect))
+        c = &pl.l1_milieu;
+      else 
+        if(SDL_PointInRect(&p,&pl.l2_droite.rect))
+        c = &pl.l2_droite;
+      else 
+        if(SDL_PointInRect(&p,&pl.l2_gauche.rect))
+        c = &pl.l2_gauche;
+      else 
+        if(SDL_PointInRect(&p,&pl.l2_milieu.rect))
+        c = &pl.l2_milieu;
+      else 
+        if(SDL_PointInRect(&p,&pl.l3_droite.rect))
+        c = &pl.l3_droite;
+      else 
+        if(SDL_PointInRect(&p,&pl.l3_gauche.rect))
+        c = &pl.l3_gauche;
+      else 
+        if(SDL_PointInRect(&p,&pl.l3_milieu.rect))
+        c = &pl.l3_milieu;
+      else {
+        //Quand le click n'est pas dans une case on reintialise le mouvement
+        click_counter -- ;
+        caseArrivee = NULL;
+        caseDepart = NULL;
+     }
+      
+    return c;
+  }
+  int verifDeplacement()
+  {
+      printf("verif ");
+      int x1 = caseDepart->x;int y1 = caseDepart->y;
+      int x2 = caseArrivee->x;int y2 = caseArrivee->y;
+      printf("Case Depart : %d %d \t Case Arrivee : %d %d \n",x1,y1,x2,y2);
+      // On verifie que la case de depart est bien occuppe et que la case d'arrivée est bien vide
+      if (!(caseDepart->estOccupee==1 && caseArrivee->estOccupee==0)) 
+        return 0;
+      int autorisee = 0;
+      /*Verifiaction des deplacements;*/
+      
+      //Depalcement des chiens 
+      if (pl.tour_a == 'c')
+      {
+          
+          //On verifie que la case de depart contient bien un chien
+          if(caseDepart->occupant!='c') return 0;
+          //Si le mouvement est un mouvement en arriere on renvoie faux
+          if(x2<x1) return 0;
+      }
+      // Deplacement du lievre
+      else{
+          //On verifie que la case de depart contient bien un lievre
+          if(caseDepart->occupant!='l') return 0;
+      }
+     // On verifie si le mouvement est d'une unité en diagonale , en abscisse ou en ordonée
+        autorisee = ((abs(x1-x2) == abs(y1-y2))          || // mouvement diagonale
+                     (abs(x1-x2) == 1 && abs(y1-y2) ==0) || // mouvement horizontale
+                     (x1 == x2 && abs(y1-y2) ==1))         // mouvement verticale 
+          ;
+         return autorisee;   
+  }
+  void deplacerPiece(SDL_Renderer *r)
+  {
+      if(caseDepart->occupant == 'c')
+      {
+        loadImage("images/imagesBMP/chien.bmp",r,&caseArrivee->rect);
+        caseArrivee->occupant='c';
+      }
+      else{
+        loadImage("images/imagesBMP/lievre.bmp",r,&caseArrivee->rect);
+        caseArrivee->occupant = 'l';
+      }
+     SDL_SetRenderDrawColor(r, 255, 255,255,0);                  
+     SDL_RenderFillRect(r,&caseDepart->rect);
+     caseDepart->occupant='n';
+     caseDepart->estOccupee=0;
+     caseArrivee->estOccupee=1;
+     SDL_RenderPresent(r);
+  }
   void clickHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
   {
      // Gestion des Clicks dans le menuPrincipal
@@ -178,6 +335,7 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
                 switchScreen(renderer,"images/imagesBMP/recapLievre.bmp","*",0);
                 switchScreen(renderer,"images/imagesBMP/board2.bmp","gameBoard",2000);
                 initPartie(&pl,renderer);
+                pl.tour_a = 'c';
             } 
         else if(SDL_PointInRect(&p,&mode2Joueurs.option2)) 
         {
@@ -187,51 +345,30 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
                 switchScreen(renderer,"images/imagesBMP/recapChien.bmp","*",0);
                 switchScreen(renderer,"images/imagesBMP/board1.bmp","gameBoard",2000);
                 initPartie(&pl,renderer);
+                pl.tour_a = 'c';
         }
         else if(SDL_PointInRect(&p,&mode2Joueurs.retour))
         {
             switchScreen(renderer,"images/imagesBMP/commencerUnePartie.bmp","commencerPartie",0);
         } 
     }
+    else if(strstr(currentFenetre,"gameBoard")!=NULL)
+    {
+        click_counter++;
+    
+        if (click_counter % 2 == 0)
+            caseArrivee = detectCase(p);
+        else 
+            caseDepart = detectCase(p);
+        
+        if(caseDepart !=NULL && caseArrivee !=NULL && verifDeplacement())
+        {
+            deplacerPiece(renderer);
+            //On donne la main au joueurSuivant
+            pl.tour_a = (pl.tour_a == 'c') ?  'l' :  'c';
+            caseArrivee = NULL;
+            caseDepart = NULL; 
+        }
+    }
   }
 
-void loadImage(const char path[], SDL_Renderer *renderer,SDL_Rect * rect)
-{
-    SDL_Surface *tmp = NULL;
-    tmp = SDL_LoadBMP(path);
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, tmp);
-    SDL_FreeSurface(tmp); 
-    SDL_RenderCopy(renderer, texture, NULL, rect);
-    SDL_RenderPresent(renderer);
-}
-
-void initPartie(Plateau * pl, SDL_Renderer * renderer)
-{
-    pl->bas.rect = (SDL_Rect){697,224,72,75};
-    pl->l1_gauche.rect = (SDL_Rect){534,396,70,76};
-    pl->l1_milieu.rect = (SDL_Rect){534,225,72,69};
-    pl->l1_droite.rect = (SDL_Rect){535,51,70,75};
-    pl->l2_gauche.rect = (SDL_Rect){366,397,69,74};
-    pl->l2_milieu.rect = (SDL_Rect){364,225,70,72};
-    pl->l2_droite.rect = (SDL_Rect){366,52,69,73};
-    pl->l3_gauche.rect = (SDL_Rect){196,394,69,75};
-    pl->l3_milieu.rect = (SDL_Rect){196,225,70,74};
-    pl->l3_droite.rect = (SDL_Rect){193,53,72,74};
-    pl->main_joueur = (SDL_Rect){278,530,282,62 };
-    pl->haut.rect = (SDL_Rect){31,224,72,74};
-    pl->chien_1.position = &pl->haut; pl->chien_1.position_precedente = &pl->haut; 
-    pl->chien_2.position = &pl->l3_droite; pl->chien_2.position_precedente = &pl->l3_droite; 
-    pl->chien_3.position = &pl->l3_gauche; pl->chien_3.position_precedente = &pl->l3_gauche; 
-    pl->lievre.position = &pl->bas; pl->lievre.position_precedente = &pl->bas; 
-    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_1.position->rect) ;   
-    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_2.position->rect) ;   
-    loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_3.position->rect) ;   
-    loadImage("images/imagesBMP/lievre.bmp",renderer,&pl->lievre.position->rect) ;
-    if (joueur1 =='c')
-        loadImage("images/imagesBMP/Main_Joueur1.bmp",renderer,&pl->main_joueur) ;
-    else 
-        loadImage("images/imagesBMP/Main_Joueur2.bmp",renderer,&pl->main_joueur) ;
-    pl->tour_a = 1;
-       
-    SDL_RenderPresent(renderer);
-}

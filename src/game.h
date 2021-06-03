@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 
 /*********************** Structures ************************/
 typedef struct menu{
@@ -13,6 +14,9 @@ typedef struct menu{
 typedef struct casePlateau{
     SDL_Rect rect;
     int estOccupee;
+    char occupant;
+    int x;
+    int y;
 }Case;
 
 typedef struct piece{
@@ -29,7 +33,7 @@ typedef struct plateau{
     Piece lievre;
     Piece chien_1;Piece chien_2;Piece chien_3;
     SDL_Rect main_joueur ;
-    int tour_a;
+    char tour_a;
 }Plateau;
 
 
@@ -43,6 +47,10 @@ extern Menu reglesJeu;
 extern char joueur1;
 extern char joueur2;
 extern Plateau pl;
+extern int click_counter;
+extern Case * caseDepart;
+extern Case * caseArrivee;
+
 /*******************************************************************************/
 
 /* 
@@ -81,3 +89,8 @@ void loadImage(const char [], SDL_Renderer *, SDL_Rect *);
 */
 void initPartie(Plateau *, SDL_Renderer *);
 
+Case * detectCase (SDL_Point);
+
+int verifDeplacement();
+
+void deplacerCase(SDL_Renderer *);

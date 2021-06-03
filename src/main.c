@@ -15,6 +15,9 @@ int continuer;
 char joueur1;
 char joueur2;
 Plateau pl;
+int click_counter;
+Case *caseDepart;
+Case *caseArrivee;
 /********************************************************************/
 
 int main(int argc, char** argv){
@@ -22,6 +25,9 @@ int main(int argc, char** argv){
     SDL_Window *window = NULL;     
     SDL_Renderer *renderer = NULL ;     
     SDL_Event event;
+    click_counter = 0;
+    caseArrivee = NULL;
+    caseArrivee = NULL;
     continuer = 1;
     if (SDL_Init(SDL_INIT_VIDEO) != 0 ){
             fprintf(stderr,"Érreur SDL_Init : %s", SDL_GetError());
@@ -63,12 +69,11 @@ int main(int argc, char** argv){
                     p.x = event.button.x;
                     p.y = event.button.y;
                     clickHandlerOptions(window,renderer,p);
+                    printf("click count : %d \n",click_counter);
                 break;
             }
         }
-        sleep(1);
     }
-    
     Quit :
     return 1;
 }
