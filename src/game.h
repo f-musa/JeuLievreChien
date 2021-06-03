@@ -44,8 +44,7 @@ extern int continuer;
 extern Menu commencerUnePartie;
 extern Menu mode2Joueurs;
 extern Menu reglesJeu;
-extern char joueur1;
-extern char joueur2;
+extern int joueurAvecMain;
 extern Plateau pl;
 extern int click_counter;
 extern Case * caseDepart;
@@ -89,8 +88,14 @@ void loadImage(const char [], SDL_Renderer *, SDL_Rect *);
 */
 void initPartie(Plateau *, SDL_Renderer *);
 
+/* Fonction qui permet de detecter la case concernée par un deplacement*/
 Case * detectCase (SDL_Point);
 
+/* Fonction qui permet de verifier la validité d'un deplacement*/
 int verifDeplacement();
 
+/* Fonction qui permet de depalcer une piece */
 void deplacerCase(SDL_Renderer *);
+
+/* Fonction qui permet de verifier si un joueur a gagner la partie*/
+void verifGagnant();

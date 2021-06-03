@@ -71,7 +71,7 @@ void initPartie(Plateau * pl, SDL_Renderer * renderer)
     loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_2.position->rect) ;   
     loadImage("images/imagesBMP/chien.bmp",renderer,&pl->chien_3.position->rect) ;   
     loadImage("images/imagesBMP/lievre.bmp",renderer,&pl->lievre.position->rect) ;
-    if (joueur1 =='c')
+    if (joueurAvecMain == 1)
         loadImage("images/imagesBMP/Main_Joueur1.bmp",renderer,&pl->main_joueur) ;
     else 
         loadImage("images/imagesBMP/Main_Joueur2.bmp",renderer,&pl->main_joueur) ;
@@ -220,13 +220,13 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
       else 
         if(SDL_PointInRect(&p,&pl.l3_milieu.rect))
         c = &pl.l3_milieu;
-      else {
         //Quand le click n'est pas dans une case on reintialise le mouvement
-        click_counter -- ;
-        caseArrivee = NULL;
-        caseDepart = NULL;
+     else{
+            printf("Deplacement non autorisee\n");
+             click_counter = 0;
+             caseArrivee =NULL;
+             caseDepart = NULL;
      }
-      
     return c;
   }
   int verifDeplacement()
@@ -236,8 +236,10 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
       int x2 = caseArrivee->x;int y2 = caseArrivee->y;
       printf("Case Depart : %d %d \t Case Arrivee : %d %d \n",x1,y1,x2,y2);
       // On verifie que la case de depart est bien occuppe et que la case d'arrivée est bien vide
-      if (!(caseDepart->estOccupee==1 && caseArrivee->estOccupee==0)) 
-        return 0;
+      if (!(caseDepart->estOccupee==1 && caseArrivee->estOccupee==0))
+        {
+          return 0;
+        }         
       int autorisee = 0;
       /*Verifiaction des deplacements;*/
       
@@ -248,18 +250,38 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
           //On verifie que la case de depart contient bien un chien
           if(caseDepart->occupant!='c') return 0;
           //Si le mouvement est un mouvement en arriere on renvoie faux
-          if(x2<x1) return 0;
+          if(x2<x1) {
+              printf("Deplacement non autorisee\n");
+              return 0;
+          }
       }
       // Deplacement du lievre
       else{
           //On verifie que la case de depart contient bien un lievre
-          if(caseDepart->occupant!='l') return 0;
+          if(caseDepart->occupant!='l') {
+              printf("Deplacement non autorisee\n");
+              return 0;
+          }
       }
      // On verifie si le mouvement est d'une unité en diagonale , en abscisse ou en ordonée
         autorisee = ((abs(x1-x2) == abs(y1-y2))          || // mouvement diagonale
                      (abs(x1-x2) == 1 && abs(y1-y2) ==0) || // mouvement horizontale
                      (x1 == x2 && abs(y1-y2) ==1))         // mouvement verticale 
           ;
+         // Condition supplémentaire pour les deplacements diagonaux
+         if(abs(x1-x2) == abs(y1-y2))
+         {
+            if ( ! (
+                   ((x1==0 && y1 ==0)||(x2==0 && y2 ==0)) ||
+                   ((x1==2 && y1 ==0)||(x2==2 && y2 ==0)) ||
+                   ((x1==-2 && y1 ==0)||(x2==-2 && y2 ==0))
+                   )
+              ) autorisee = 0;
+         }
+         
+         if(!autorisee) {
+             printf("Deplacement non autorisee\n");   
+         }
          return autorisee;   
   }
   void deplacerPiece(SDL_Renderer *r)
@@ -268,10 +290,18 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
       {
         loadImage("images/imagesBMP/chien.bmp",r,&caseArrivee->rect);
         caseArrivee->occupant='c';
+        // On change la valeur de la position du chien qui s'est déplacé 
+        if (pl.chien_1.position == caseDepart)
+            pl.chien_1.position = caseArrivee;
+        else if (pl.chien_2.position == caseDepart)
+            pl.chien_2.position = caseArrivee;
+        else 
+            pl.chien_3.position = caseArrivee;
       }
       else{
         loadImage("images/imagesBMP/lievre.bmp",r,&caseArrivee->rect);
         caseArrivee->occupant = 'l';
+        pl.lievre.position = caseArrivee;
       }
      SDL_SetRenderDrawColor(r, 255, 255,255,0);                  
      SDL_RenderFillRect(r,&caseDepart->rect);
@@ -330,8 +360,7 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
             {
                 //Joueur  est le lievre | Joueur 2 est le chien 
                 //On affiche le recap et on passe vers la partie
-                joueur1 = 'l';
-                joueur2 = 'c';
+                joueurAvecMain = 2;
                 switchScreen(renderer,"images/imagesBMP/recapLievre.bmp","*",0);
                 switchScreen(renderer,"images/imagesBMP/board2.bmp","gameBoard",2000);
                 initPartie(&pl,renderer);
@@ -340,8 +369,7 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
         else if(SDL_PointInRect(&p,&mode2Joueurs.option2)) 
         {
             //Joueur 1 est le chien | Joueur 2 est le lievre
-                joueur1 = 'c';
-                joueur2 = 'l';
+                joueurAvecMain = 1;
                 switchScreen(renderer,"images/imagesBMP/recapChien.bmp","*",0);
                 switchScreen(renderer,"images/imagesBMP/board1.bmp","gameBoard",2000);
                 initPartie(&pl,renderer);
@@ -354,21 +382,49 @@ void hoverHandlerOptions(SDL_Window *window,SDL_Renderer *renderer,SDL_Point p)
     }
     else if(strstr(currentFenetre,"gameBoard")!=NULL)
     {
-        click_counter++;
-    
-        if (click_counter % 2 == 0)
+        
+        if (detectCase(p)!=NULL) click_counter++;
+         
+         
+        if (click_counter == 2)
             caseArrivee = detectCase(p);
-        else 
+        else if(click_counter == 1)
             caseDepart = detectCase(p);
         
-        if(caseDepart !=NULL && caseArrivee !=NULL && verifDeplacement())
+        if(caseDepart !=NULL && caseArrivee !=NULL )
         {
+            if(verifDeplacement())
+            {
             deplacerPiece(renderer);
-            //On donne la main au joueurSuivant
+            //On donne la main au joueurSuivant et on modifie l'affichage
+            SDL_SetRenderDrawColor(renderer, 0, 0,0,0);                  
+            SDL_RenderFillRect(renderer,&pl.main_joueur);
+            if(joueurAvecMain == 1){
+               loadImage("images/imagesBMP/Main_Joueur2.bmp",renderer,&pl.main_joueur) ;
+               joueurAvecMain = 2;
+            }  
+            else {
+               loadImage("images/imagesBMP/Main_Joueur1.bmp",renderer,&pl.main_joueur) ; 
+               joueurAvecMain = 1;
+            }
             pl.tour_a = (pl.tour_a == 'c') ?  'l' :  'c';
-            caseArrivee = NULL;
-            caseDepart = NULL; 
+
+            }
+            else 
+                printf("Deplacement non autorisee\n");
+            click_counter = 0;
+            caseArrivee =NULL;
+            caseDepart = NULL;                        
         }
+        
+        
+        
     }
   }
+
+ void verifGagnant()
+ {
+     // On verifie si les chiens ont gagnes
+
+ }
 
